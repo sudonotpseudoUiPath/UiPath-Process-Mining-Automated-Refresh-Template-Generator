@@ -1,0 +1,19 @@
+set LOGIN_ID=__LOGIN_ID_PLACEHOLDER__
+set WORKSPACE_NAME=__WORKSPACE_NAME_PLACEHOLDER__
+
+set MAINDIR=%~dp0
+set DATASET=__DATASET_NAME_PLACEHOLDER__
+set ENVIRONMENT=__ENVIRONMENT_NAME_PLACEHOLDER__
+set WORKSPACE="%LOGIN_ID%/%WORKSPACE_NAME%"
+
+mkdir "%MAINDIR%\datax\_datasets\%DATASET%"
+mkdir "%MAINDIR%\datax\_datasets\%DATASET%\_org"
+echo. > "%MAINDIR%\datax\_datasets\%DATASET%\usemodcodes.marker"
+
+for %%M in (__MODULE_NAME__) do (
+              call "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -CCDB app="%%M" o= refreshmvncaches=true
+              mkdir "%MAINDIR%\datax\_datasets\%DATASET%\_org\%%M\MVNCache" 
+              call "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -export app="%%M" out="%MAINDIR%\datax\_datasets\%DATASET%\_org\%%M\MVNCache" o= refreshmvncaches=false reusecache=true onlymarked=true
+)
+
+call "%MAINDIR%\builds\processgold.bat" -dataserver -skipmail -env "%ENVIRONMENT%" -CCDB o=* dataset="%DATASET%" p=*
