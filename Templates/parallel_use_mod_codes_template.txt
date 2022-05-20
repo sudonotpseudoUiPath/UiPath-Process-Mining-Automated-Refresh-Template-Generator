@@ -1,0 +1,34 @@
+IF "%~1"=="SUBROUTINE" (GOTO :SUB) ELSE (GOTO :MAIN)
+
+:MAIN
+SET LOGIN_ID=__LOGIN_ID_PLACEHOLDER__
+SET WORKSPACE_NAME=__WORKSPACE_NAME_PLACEHOLDER__
+SET MAINDIR=%~dp0
+SET DATASET=__DATASET_NAME_PLACEHOLDER__
+SET ENVIRONMENT=__ENVIRONMENT_NAME_PLACEHOLDER__
+SET WORKSPACE="%LOGIN_ID%/%WORKSPACE_NAME%"
+
+MKDIR "%MAINDIR%\datax\_datasets\%DATASET%"
+MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org"
+ECHO. > "%MAINDIR%\datax\_datasets\%DATASET%\usemodcodes.marker"
+
+FOR %%M IN (__MODULE_NAME__) DO (
+    START %~nx0 "SUBROUTINE" %%M %LOGIN_ID% %WORKSPACE% %DATASET% %ENVIRONMENT%
+)
+GOTO :EOF
+
+:SUB
+SHIFT
+SET MAINDIR=%~dp0
+SET MODULE=%1
+SET LOGIN_ID=%2
+SET WORKSPACE=%3
+SET DATASET=%4
+SET ENVIRONMENT=%5
+CALL "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -CCDB app="%MODULE%" o= refreshmvncaches=true
+MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org\%1\MVNCache" 
+CALL "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -export app="%MODULE%" out="%MAINDIR%\datax\_datasets\%DATASET%\_org\%MODULE%\MVNCache" o= refreshmvncaches=false reusecache=true onlymarked=true
+CALL "%MAINDIR%\builds\processgold.bat" -dataserver -skipmail -env "%ENVIRONMENT%" -CCDB o=* dataset="%DATASET%" app="%MODULE%"
+EXIT
+
+:EOF

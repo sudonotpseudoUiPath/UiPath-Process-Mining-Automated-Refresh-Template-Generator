@@ -1,8 +1,7 @@
 
 # UiPath Process Mining Batch Template Generator
 
-A script designed to aid in the batch file generation process 
-for use with the UiPath Process Mining tool.
+A script designed to aid in the batch file generation process for use with the UiPath Process Mining tool.
 
 ![Logo](https://files.readme.io/e04f75c-small-ui_path_Logo_PREF_rgb_Orange_digital_309x110.png)
 ## Authors
@@ -11,6 +10,10 @@ for use with the UiPath Process Mining tool.
 ## Dependencies
 - Python 3.x
 ## Changelog
+- **05/20/2022** - v1.1.0
+  - Updated formatting and syntax for template referencing files
+  - Created additional template reference file for multi module parallel loading
+  - Added additional command line flag `-p [--parallel]` to allow for parallel data loading
 - **05/11/2022** - v1.0.0
   - Initial version of the Batch Template Generator
   - Created separate template reference files for single module and multi module formatting.
@@ -19,16 +22,18 @@ for use with the UiPath Process Mining tool.
 ## Usage/Examples
 
 ```
-usage: python3 template_generator.py [-h] [-i <inputfile>] [-o <outputfile>]
+usage: python3 template_generator.py [-h] -i <inputfile> [-o <outputfile>] [-p]
 ```
 - **-h**
   - Default help function, returns the expected format to invoke the script, returns the following `'template_generator.py -i <inputfile> -o <outputfile>'`
-- **-i <inputfile>** 
+- **-i [--ifile] <inputfile>** 
   - By default, the expected `inputfile` is the provided **config.csv**, which contains all of the necessary fields to properly generate the batch script.
-  - _E.G._ `-i config.csv`
-- **-o <outputfile>**
-  - The value provided for `outputfile` requires a file extension to be provided.  You can output to any file extension, recommended extensions would be __*.txt__ or __*.bat__.
-  - _E.G._ `-o data_refresh_script.bat`
+  - _E.G._ `-i config.csv` or `--ifile config.csv`
+- **-o [--ofile] <outputfile>**
+  - The value provided for `outputfile` requires a file extension to be provided.  You can output to any file extension, recommended extensions are __*.txt__ or __*.bat__.
+  - _E.G._ `-o data_refresh_script.bat` or `--ofile data_refresh_script.bat`
+- **-p [--parllel]**
+  - A flag to select the parallel data loading template for multi module applicaitons.  Has no effect on single module loading.
 
 ```python3 template_generator.py -i config.csv -o data_refresh_script.bat```
 ## FAQ
@@ -45,7 +50,12 @@ If you do not provide a value for the `-o <outputfile>` command line argument, t
 
 The script checks the number of provided module names in the `config.csv` template file, and automatically selects the correct template and formatting to achieve either Single or Multi Module implementations.  No need to worry about anything too complex!
 
+#### What is the difference between Parallel and Sequential Multi Module loading?
+
+When running the sequential multi module refresh script, each sharded module will be loaded one at at time, and then each module in the released application will have its cache refreshed one at a time.  This can take a very long time for large datasets with a high number of shards.  By implementing the parallel multi module refresh script, we can have each separate data shard be loaded and cached independant of one another, allowing us to save time.
+
+**NOTE:** Using parallel mutli module refreshing consumes a large amount of system resource, and may not be suitable for all systems.  It is recommended to test on Development/UAT before deploying to Production.
+
 #### I have a question that is not answered above...
 
 Not a worry at all!  Feel free to email the author about any further questions you might happen to have, he will be more than happy to help.
-
