@@ -10,6 +10,11 @@ A script designed to aid in the batch file generation process for use with the U
 ## Dependencies
 - Python 3.x
 ## Changelog
+- **05/31/2022** - v1.2.0
+  - Added `hexEncode()` function to handle HTML encoding for Login ID's containing special characters.
+  - Adjusted `parallel_use_mod_codes_template.txt` to account for an edge case occuring from scheduling a chronjob at root directory level for the batch execution leading to a failure to execute the subroutine callback.
+  - Added exit codes to all batch templates to account for chronjob scheduling checks.
+  - Corrected grammar and spelling in README.md
 - **05/20/2022** - v1.1.0
   - Updated formatting and syntax for template referencing files
   - Created additional template reference file for multi module parallel loading
@@ -32,7 +37,7 @@ usage: python3 template_generator.py [-h] -i <inputfile> [-o <outputfile>] [-p]
 - **-o [--ofile] <outputfile>**
   - The value provided for `outputfile` requires a file extension to be provided.  You can output to any file extension, recommended extensions are __*.txt__ or __*.bat__.
   - _E.G._ `-o data_refresh_script.bat` or `--ofile data_refresh_script.bat`
-- **-p [--parllel]**
+- **-p [--parallel]**
   - A flag to select the parallel data loading template for multi module applicaitons.  Has no effect on single module loading.
 
 ```python3 template_generator.py -i config.csv -o data_refresh_script.bat```

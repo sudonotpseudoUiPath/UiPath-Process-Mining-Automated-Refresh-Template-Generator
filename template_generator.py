@@ -4,6 +4,9 @@
 from os import environ
 import sys, getopt, csv
 
+def hexEncode(inputString):
+    return ''.join([(hex(ord(x)).replace('0x', '%%%%').upper() if not(x.isalnum()) else x) for x in inputString])
+
 def generate_template(input_file_name, output_file_name, is_parallel):
    if input_file_name == '':
       print("Please provide a valid input file.")
@@ -29,7 +32,7 @@ def generate_template(input_file_name, output_file_name, is_parallel):
         
       with open(template, "r") as file:
          file_text = file.read()
-         file_text = file_text.replace("__LOGIN_ID_PLACEHOLDER__", login_id)
+         file_text = file_text.replace("__LOGIN_ID_PLACEHOLDER__", hexEncode(login_id))
          file_text = file_text.replace("__WORKSPACE_NAME_PLACEHOLDER__", workspace_name)
          file_text = file_text.replace("__DATASET_NAME_PLACEHOLDER__", dataset_name)
          file_text = file_text.replace("__ENVIRONMENT_NAME_PLACEHOLDER__", environment_name)

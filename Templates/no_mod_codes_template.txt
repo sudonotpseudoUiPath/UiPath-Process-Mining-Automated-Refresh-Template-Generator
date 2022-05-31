@@ -17,3 +17,4 @@ FOR %%M IN (__MODULE_NAME__) DO (
 )
 
 CALL "%MAINDIR%\builds\processgold.bat" -dataserver -skipmail -env "%ENVIRONMENT%" -CCDB o=* dataset="%DATASET%" p=*
+EXIT 0

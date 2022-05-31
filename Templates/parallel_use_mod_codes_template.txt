@@ -13,6 +13,7 @@ MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org"
 ECHO. > "%MAINDIR%\datax\_datasets\%DATASET%\usemodcodes.marker"
 
 FOR %%M IN (__MODULE_NAME__) DO (
+    CD %MAINDIR%
     START %~nx0 "SUBROUTINE" %%M %LOGIN_ID% %WORKSPACE% %DATASET% %ENVIRONMENT%
 )
 GOTO :EOF
@@ -29,6 +30,7 @@ CALL "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" 
 MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org\%1\MVNCache" 
 CALL "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -export app="%MODULE%" out="%MAINDIR%\datax\_datasets\%DATASET%\_org\%MODULE%\MVNCache" o= refreshmvncaches=false reusecache=true onlymarked=true
 CALL "%MAINDIR%\builds\processgold.bat" -dataserver -skipmail -env "%ENVIRONMENT%" -CCDB o=* dataset="%DATASET%" app="%MODULE%"
-EXIT
+EXIT 1
 
 :EOF
+EXIT 0
