@@ -1,0 +1,177 @@
+#Line Of Business: __LOB__
+#Data Classification: __DATA_CLASSIFICATION__
+#Requested Process Mining URL: __URL__
+#Schedule: __SCHEDULE__
+
+#Define Globals
+$LOGIN_ID="__LOGIN_ID_PLACEHOLDER__"
+$WORKSPACE_NAME="__WORKSPACE_NAME_PLACEHOLDER__"
+$MAINDIR=$PSScriptRoot
+$DATASET="__DATASET_NAME_PLACEHOLDER__"
+$ENVIRONMENT="__ENVIRONMENT_NAME_PLACEHOLDER__"
+$WORKSPACE="$LOGIN_ID/$WORKSPACE_NAME"
+$MODULES = __MODULE_NAME__
+$EMAILS = "__EMAILS__"
+$EMAILS_CC = "__EMAILS_CC__"
+$EMAILS_BCC = "__EMAILS_BCC__"
+$STATUS=0
+
+#Set Global Value for date used for logging purposes
+$logdate = Get-Date -Format "yyyy-MM-dd"
+$scriptname = [System.IO.Path]::GetFileNameWithoutExtension("$PSCommandPath")
+
+#Setup for Path Variables
+$MagnaViewPath = Get-Content -Path "$MAINDIR\builds\processgold.bat" -Raw
+$MagnaViewPath = $MagnaViewPath.Replace('@"%~dp0./', '').Replace('" %*', '').Replace("/", "\")
+$ProcessMiningPath = "$MAINDIR\builds\$MagnaViewPath"
+
+function Send-Mail( $Subject, $Body, $Attachments ) {
+	$SmtpServer = "__SMTP_SERVER__"
+
+	$MailMessage = New-Object System.Net.Mail.MailMessage
+	$SMTPClient = New-Object System.Net.Mail.smtpClient
+	$SMTPClient.host = $SmtpServer
+	$to = $EMAILS
+	$from = "__FROM__"
+	$cc = $EMAILS_CC        # Add as needed
+    $bcc = $EMAILS_BCC      # Add as needed
+	
+    $Recipient = New-Object System.Net.Mail.MailAddress( $to )
+	$AutoSender = New-Object System.Net.Mail.MailAddress( $from )
+
+	$MailMessage.Sender = $AutoSender
+	$MailMessage.From = $AutoSender
+	$MailMessage.To.add( $Recipient )
+	if($cc) {$MailMessage.CC.add( $cc )	}       # Add as needed
+	if($bcc) {$MailMessage.BCC.add( $bcc ) }    # Add as needed
+	$MailMessage.Subject = $Subject
+	$MailMessage.Body = $Body
+
+	if ( $Attachments -ne $false ) {
+		$Attachments | ForEach-Object {
+		$filePath = $_
+		$attachment = new-object Net.Mail.Attachment($filePath)
+		$MailMessage.Attachments.Add($attachment)
+		}
+	} 
+
+	$SMTPClient.Send( $MailMessage )
+}
+
+function Log([string]$message){
+    $logdatetime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    "[$logdatetime] $message" >> "$MAINDIR\logs\$logdate\auto_log_${scriptname}_$logdate.txt"
+}
+
+function GetLogPath([string]$ID, [string]$timestamp){
+    $folder = "$PSScriptRoot\logs\$timestamp"
+    return (Get-ChildItem $folder -File | Where-Object {$_.Name -like "*_$ID.txt"} | Sort-Object -Descending -Property LastWriteTime | Select-Object -First 1).FullName
+}
+
+function Cache([string]$MODULE) {
+    Log "Beginning Connector Level Cache Generation for module: $MODULE in: $WORKSPACE."
+    $ArgList = "-dataserver -workspace `"$WORKSPACE`" `"`" -CCDB app=`"$MODULE`" o= refreshmvncaches=true"
+    $timestamp = Get-Date -Format "yyyy-MM-dd"
+    $CurrentProcess = Start-Process -FilePath "$ProcessMiningPath" -ArgumentList $ArgList -NoNewWindow -PassThru -Wait
+    $STATUSMESSAGE = ""
+    $CurrentLogPath = GetLogPath $($CurrentProcess.Id) $timestamp
+    [array]$Attachments = @()
+    if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
+        $STATUSMESSAGE = " An error has occurred in the connector level cache generation process for the current workspace module."
+        $Attachments += $CurrentLogPath
+        $Subject = "An error has occurred in [$scriptname] on __URL__"
+        [string]$Body = @"
+An error has occured in the connector level cache generation process for the $MODULE module in the $WORKSPACE workspace.
+Attached is the log file detailing the error observed.
+
+Signed,
+Your automated nightly refresh.
+
+This is an automated message sent out by the nightly refresh script set up on __URL__, please do not respond to this email.
+[Script Name: $scriptname]
+"@
+        Send-Mail $Subject $Body $Attachments
+    }
+    Log "Connector Level Cache Generation for module: $MODULE in: $WORKSPACE completed.  Exiting with Status Code $($CurrentProcess.ExitCode).$STATUSMESSAGE This can be found in the log for PID $($CurrentProcess.Id). ($CurrentLogPath)"
+    return $($CurrentProcess.ExitCode)
+}
+
+function Load([string]$MODULE) {
+    MKDIR "$MAINDIR\datax\_datasets\$DATASET\_org\MVNCache"
+    Log "Beginning Connector Level Dataset Loading for module: $MODULE in: $WORKSPACE."
+    $ArgList = "-dataserver -workspace `"$WORKSPACE`" `"`" -export app=`"$MODULE`" out=`"$MAINDIR\datax\_datasets\$DATASET\_org\MVNCache`" o= refreshmvncaches=false reusecache=true onlymarked=true"
+    $timestamp = Get-Date -Format "yyyy-MM-dd"
+    $CurrentProcess = Start-Process -FilePath "$ProcessMiningPath" -ArgumentList $ArgList -NoNewWindow -PassThru -Wait
+    $STATUSMESSAGE = ""
+    $CurrentLogPath = GetLogPath $($CurrentProcess.Id) $timestamp
+    [array]$Attachments = @()
+    if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
+        $STATUSMESSAGE = " An error has occurred in the connector level dataset loading process for the current workspace module."
+        $Attachments += $CurrentLogPath
+        $Subject = "An error has occurred in [$scriptname] on __URL__"
+        [string]$Body = @"
+An error has occured in the connector level dataset loading process for the $MODULE module in the $WORKSPACE workspace.
+Attached is the log file detailing the error observed.
+
+Signed,
+Your automated nightly refresh.
+
+This is an automated message sent out by the nightly refresh script set up on __URL__, please do not respond to this email.
+[Script Name: $scriptname]
+"@
+        Send-Mail $Subject $Body $Attachments
+    }
+    Log "Connector Level Dataset Loading for module: $MODULE in: $WORKSPACE completed.  Exiting with Status Code $($CurrentProcess.ExitCode).$STATUSMESSAGE This can be found in the log for PID $($CurrentProcess.Id). ($CurrentLogPath)"
+    return $($CurrentProcess.ExitCode)
+}
+
+function Deploy([string]$MODULE) {
+    Log "Beginning Application Level Cache Generation for module: $MODULE in: $WORKSPACE."
+    $ArgList = "-dataserver -skipmail -env `"$ENVIRONMENT`" -CCDB o=* dataset=`"$DATASET`" p=*"
+    $timestamp = Get-Date -Format "yyyy-MM-dd"
+    $CurrentProcess = Start-Process -FilePath "$ProcessMiningPath" -ArgumentList $ArgList -NoNewWindow -PassThru -Wait
+    $STATUSMESSAGE = ""
+    $CurrentLogPath = GetLogPath $($CurrentProcess.Id) $timestamp
+    [array]$Attachments = @()
+    if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
+        $STATUSMESSAGE = " An error has occurred in the application level cache generation for the current module in the environment."
+        $Attachments += $CurrentLogPath
+        $Subject = "An error has occurred in [$scriptname] on __URL__"
+        [string]$Body = @"
+An error has occured in the application level cache generation process for the $MODULE module in the $ENVIRONMENT environment.
+Attached is the log file detailing the error observed.
+
+Signed,
+Your automated nightly refresh.
+
+This is an automated message sent out by the nightly refresh script set up on __URL__, please do not respond to this email.
+[Script Name: $scriptname]
+"@
+        Send-Mail $Subject $Body $Attachments
+    }
+    Log "Application Level Cache Generation for module: $MODULE in: $ENVIRONMENT completed.  Exiting with Status Code $($CurrentProcess.ExitCode).$STATUSMESSAGE This can be found in the log for PID $($CurrentProcess.Id). ($CurrentLogPath)"
+    return $($CurrentProcess.ExitCode)
+}
+
+function Main {
+    Log "Batch Execution Started"
+    if (Test-Path -Path "$MAINDIR\datax\_datasets\$DATASET") {
+        #Remove Old Dataset
+        Remove-Item -Path "$MAINDIR\datax\_datasets\$DATASET" -Recurse
+    } else {
+        #Nothing to Remove
+    }
+    MKDIR $MAINDIR\datax\_datasets\$DATASET
+    MKDIR $MAINDIR\datax\_datasets\$DATASET\_org
+    " " > $MAINDIR\datax\_datasets\$DATASET\nomodcodes.marker
+    
+    foreach($module in $MODULES){
+        $STATUS = Cache $module
+
+        if($STATUS -eq 0){Load $module}
+        Deploy $module
+    }
+    Log "Batch Execution Completed"
+}
+
+Main

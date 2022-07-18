@@ -1,16 +1,22 @@
-SET LOGIN_ID=__LOGIN_ID_PLACEHOLDER__
-SET WORKSPACE_NAME=__WORKSPACE_NAME_PLACEHOLDER__
+REM Line Of Business: LOB Name
+REM Data Classification: Data Classification Type
+REM Requested Process Mining URL: https://www.processminingservername.com
+REM Schedule: 12am EST nightly
+
+SET LOGIN_ID=MyUserID
+SET WORKSPACE_NAME=MyWorkspaceName
 
 SET MAINDIR=%~dp0
-SET DATASET=__DATASET_NAME_PLACEHOLDER__
-SET ENVIRONMENT=__ENVIRONMENT_NAME_PLACEHOLDER__
+SET DATASET=MyDatasetName
+SET ENVIRONMENT=MyEnvironmentName
 SET WORKSPACE="%LOGIN_ID%/%WORKSPACE_NAME%"
 
+RMDIR /Q /S "%MAINDIR%\datax\_datasets\%DATASET%"
 MKDIR "%MAINDIR%\datax\_datasets\%DATASET%"
 MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org"
 ECHO. > "%MAINDIR%\datax\_datasets\%DATASET%\usemodcodes.marker"
 
-FOR %%M IN (__MODULE_NAME__) DO (
+FOR %%M IN (Shard1,Shard2,Shard3) DO (
               CALL "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -CCDB app="%%M" o= refreshmvncaches=true
               MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org\%%M\MVNCache" 
               CALL "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -export app="%%M" out="%MAINDIR%\datax\_datasets\%DATASET%\_org\%%M\MVNCache" o= refreshmvncaches=false reusecache=true onlymarked=true

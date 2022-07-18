@@ -1,3 +1,8 @@
+REM Line Of Business: __LOB__
+REM Data Classification: __DATA_CLASSIFICATION__
+REM Requested Process Mining URL: __URL__
+REM Schedule: __SCHEDULE__
+
 IF "%~1"=="SUBROUTINE" (GOTO :SUB) ELSE (GOTO :MAIN)
 
 :MAIN
@@ -8,6 +13,7 @@ SET DATASET=__DATASET_NAME_PLACEHOLDER__
 SET ENVIRONMENT=__ENVIRONMENT_NAME_PLACEHOLDER__
 SET WORKSPACE="%LOGIN_ID%/%WORKSPACE_NAME%"
 
+RMDIR /Q /S "%MAINDIR%\datax\_datasets\%DATASET%"
 MKDIR "%MAINDIR%\datax\_datasets\%DATASET%"
 MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org"
 ECHO. > "%MAINDIR%\datax\_datasets\%DATASET%\usemodcodes.marker"

@@ -1,0 +1,26 @@
+REM Line Of Business: __LOB__
+REM Data Classification: __DATA_CLASSIFICATION__
+REM Requested Process Mining URL: __URL__
+REM Schedule: __SCHEDULE__
+
+SET LOGIN_ID=__LOGIN_ID_PLACEHOLDER__
+SET WORKSPACE_NAME=__WORKSPACE_NAME_PLACEHOLDER__
+
+SET MAINDIR=%~dp0
+SET DATASET=__DATASET_NAME_PLACEHOLDER__
+SET ENVIRONMENT=__ENVIRONMENT_NAME_PLACEHOLDER__
+SET WORKSPACE="%LOGIN_ID%/%WORKSPACE_NAME%"
+
+RMDIR /Q /S "%MAINDIR%\datax\_datasets\%DATASET%"
+MKDIR "%MAINDIR%\datax\_datasets\%DATASET%"
+MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org"
+ECHO. > "%MAINDIR%\datax\_datasets\%DATASET%\nomodcodes.marker"
+
+FOR %%M IN (__MODULE_NAME__) DO (
+              CALL "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -CCDB app="%%M" o= refreshmvncaches=true
+              MKDIR "%MAINDIR%\datax\_datasets\%DATASET%\_org\MVNCache" 
+              CALL "%MAINDIR%\builds\processgold.bat" -dataserver -workspace "%WORKSPACE%" "" -export app="%%M" out="%MAINDIR%\datax\_datasets\%DATASET%\_org\MVNCache" o= refreshmvncaches=false reusecache=true onlymarked=true
+)
+
+CALL "%MAINDIR%\builds\processgold.bat" -dataserver -skipmail -env "%ENVIRONMENT%" -CCDB o=* dataset="%DATASET%" p=*
+EXIT 0
