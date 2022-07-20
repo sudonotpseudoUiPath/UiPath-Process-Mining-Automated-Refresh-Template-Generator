@@ -36,12 +36,11 @@ function Send-Mail( $Subject, $Body, $Attachments ) {
 	$cc = $EMAILS_CC        # Add as needed
     $bcc = $EMAILS_BCC      # Add as needed
 	
-    $Recipient = New-Object System.Net.Mail.MailAddress( $to )
 	$AutoSender = New-Object System.Net.Mail.MailAddress( $from )
 
 	$MailMessage.Sender = $AutoSender
 	$MailMessage.From = $AutoSender
-	$MailMessage.To.add( $Recipient )
+	$MailMessage.To.add( $to )
 	if($cc) {$MailMessage.CC.add( $cc )	}       # Add as needed
 	if($bcc) {$MailMessage.BCC.add( $bcc ) }    # Add as needed
 	$MailMessage.Subject = $Subject
@@ -56,6 +55,20 @@ function Send-Mail( $Subject, $Body, $Attachments ) {
 	} 
 
 	$SMTPClient.Send( $MailMessage )
+}
+
+function Startup-Email(){
+    $Subject = "[$scriptname] has beguin  on __URL__"
+    [string]$Body = @"
+The refresh script execution on __URL__ has begun.
+
+Signed,
+Your automated nightly refresh.
+
+This is an automated message sent out by the nightly refresh script set up on __URL__, please do not respond to this email.
+[Script Name: $scriptname]
+"@
+        Send-Mail $Subject $Body
 }
 
 function Log([string]$message){
@@ -155,6 +168,7 @@ This is an automated message sent out by the nightly refresh script set up on __
 
 function Main {
     Log "Batch Execution Started"
+    Startup-Email
     if (Test-Path -Path "$MAINDIR\datax\_datasets\$DATASET") {
         #Remove Old Dataset
         Remove-Item -Path "$MAINDIR\datax\_datasets\$DATASET" -Recurse

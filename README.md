@@ -10,7 +10,11 @@ A script designed to aid in the automated refresh file generation process for us
 ## Dependencies
 - Python 3.10+
 ## Changelog
-- **07/18/2022** - v.1.3.0
+- **07/20/2022** - v1.3.1
+  - Corrected email formatting in powershell template generator use case.
+  - Corrected `Send-Mail` function in Powershell template.
+  - Added `Startup-Email` function to Powershell template to allow for an email notification to be sent out on script startup.
+- **07/18/2022** - v1.3.0
   - Dependecies updated to **Python 3.10+** from **Python 3.x**
   - Corrected error causing the longform command line flag for `-p` parallel to be `--parllel` instead of `--parallel`.
   - Naming convention, formatting, and whitespace cleanup.

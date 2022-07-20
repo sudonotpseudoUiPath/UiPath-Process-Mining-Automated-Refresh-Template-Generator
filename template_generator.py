@@ -74,9 +74,9 @@ def generate_template(input_file_name, output_file_name, is_parallel, template_t
 				file_text = file_text.replace("__MODULE_NAME__", ",".join(module_name))
 			elif(template_type=="Powershell"):
 				file_text = file_text.replace("__MODULE_NAME__", ",".join([f'"{x}"' for x in module_name]))
-				file_text = file_text.replace("__EMAILS__", ",".join(emails))
-				file_text = file_text.replace("__EMAILS_CC__", ",".join(cc))
-				file_text = file_text.replace("__EMAILS_BCC__", ",".join(bcc))
+				file_text = file_text.replace("__EMAILS__", ", ".join(emails))
+				file_text = file_text.replace("__EMAILS_CC__", ", ".join(cc))
+				file_text = file_text.replace("__EMAILS_BCC__", ", ".join(bcc))
 				
 				smtp_settings = open("smtp_settings.json")
 				smtp_data = json.load(smtp_settings)
