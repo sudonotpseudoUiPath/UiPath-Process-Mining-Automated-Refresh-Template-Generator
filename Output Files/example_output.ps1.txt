@@ -11,7 +11,7 @@ $DATASET="MyDatasetName"
 $ENVIRONMENT="MyEnvironmentName"
 $WORKSPACE="$LOGIN_ID/$WORKSPACE_NAME"
 $MODULES = "Shard1","Shard2","Shard3"
-$EMAILS = "email1@company.com,email2@company.com,email3@company.com,email4@company.com,email5@company.com"
+$EMAILS = "email1@company.com, email2@company.com, email3@company.com, email4@company.com, email5@company.com"
 $EMAILS_CC = ""
 $EMAILS_BCC = ""
 $STATUS=0
@@ -57,6 +57,20 @@ function Send-Mail( $Subject, $Body, $Attachments ) {
 	$SMTPClient.Send( $MailMessage )
 }
 
+function Startup-Email(){
+    $Subject = "$logdate [$scriptname] has beguin on https://www.processminingservername.com"
+    [string]$Body = @"
+The refresh script execution on https://www.processminingservername.com has begun.
+
+Signed,
+Your automated nightly refresh.
+
+This is an automated message sent out by the nightly refresh script set up on https://www.processminingservername.com, please do not respond to this email.
+[Script Name: $scriptname]
+"@
+        Send-Mail $Subject $Body
+}
+
 function Log([string]$message){
     $logdatetime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     "[$logdatetime] $message" >> "$MAINDIR\logs\$logdate\auto_log_${scriptname}_$logdate.txt"
@@ -78,7 +92,7 @@ function Cache([string]$MODULE) {
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the connector level cache generation process for the current workspace module."
         $Attachments += $CurrentLogPath
-        $Subject = "An error has occurred in [$scriptname] on https://www.processminingservername.com"
+        $Subject = "$logdate An error has occurred in [$scriptname] on https://www.processminingservername.com"
         [string]$Body = @"
 An error has occured in the connector level cache generation process for the $MODULE module in the $WORKSPACE workspace.
 Attached is the log file detailing the error observed.
@@ -107,7 +121,7 @@ function Load([string]$MODULE) {
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the connector level dataset loading process for the current workspace module."
         $Attachments += $CurrentLogPath
-        $Subject = "An error has occurred in [$scriptname] on https://www.processminingservername.com"
+        $Subject = "$logdate An error has occurred in [$scriptname] on https://www.processminingservername.com"
         [string]$Body = @"
 An error has occured in the connector level dataset loading process for the $MODULE module in the $WORKSPACE workspace.
 Attached is the log file detailing the error observed.
@@ -135,7 +149,7 @@ function Deploy([string]$MODULE) {
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the application level cache generation for the current module in the environment."
         $Attachments += $CurrentLogPath
-        $Subject = "An error has occurred in [$scriptname] on https://www.processminingservername.com"
+        $Subject = "$logdate An error has occurred in [$scriptname] on https://www.processminingservername.com"
         [string]$Body = @"
 An error has occured in the application level cache generation process for the $MODULE module in the $ENVIRONMENT environment.
 Attached is the log file detailing the error observed.
@@ -154,6 +168,7 @@ This is an automated message sent out by the nightly refresh script set up on ht
 
 function Main {
     Log "Batch Execution Started"
+    Startup-Email
     if (Test-Path -Path "$MAINDIR\datax\_datasets\$DATASET") {
         #Remove Old Dataset
         Remove-Item -Path "$MAINDIR\datax\_datasets\$DATASET" -Recurse

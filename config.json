@@ -1,0 +1,22 @@
+{
+    "LOGIN_ID": "MyUserID",
+    "WORKSPACE_NAME": "MyWorkspaceName",
+    "DATASET_NAME": "MyDatasetName",
+    "ENVIRONMENT_NAME": "MyEnvironmentName",
+    "MODULE_NAME": ["Shard1", "Shard2", "Shard3"],
+    "LINE_OF_BUSINESS": "LOB Name",
+    "DATA_CLASSIFICATION": "Data Classification Type",
+    "URL": "https://www.processminingservername.com",
+    "SCHEDULE": "12am EST nightly",
+    "EMAIL": [
+        "email1@company.com",
+        "email2@company.com",
+        "email3@company.com",
+        "email4@company.com",
+        "email5@company.com"
+        ],
+    "EMAIL_CC": [],
+    "EMAIL_BCC": [],
+    "SMTP_SERVER": "smtp.company.com",
+    "FROM_ADDRESS": "noreply@company.com"
+}

@@ -1,6 +1,0 @@
-LOGIN_ID,WORKSPACE_NAME,DATASET_NAME,ENVIRONMENT_NAME,MODULE_NAME,LINE_OF_BUSINESS,DATA_CLASSIFICATION,URL,SCHEDULE,EMAIL,EMAIL_CC,EMAIL_BCC
-MyUserID,MyWorkspaceName,MyDatasetName,MyEnvironmentName,Shard1,LOB Name,Data Classification Type,https://www.processminingservername.com,12am EST nightly,email1@company.com,,
-,,,,Shard2,,,,,email2@company.com,,
-,,,,Shard3,,,,,email3@company.com,,
-,,,,,,,,,email4@company.com,,
-,,,,,,,,,email5@company.com,,

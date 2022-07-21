@@ -58,7 +58,7 @@ function Send-Mail( $Subject, $Body, $Attachments ) {
 }
 
 function Startup-Email(){
-    $Subject = "[$scriptname] has beguin  on __URL__"
+    $Subject = "$logdate [$scriptname] has beguin on __URL__"
     [string]$Body = @"
 The refresh script execution on __URL__ has begun.
 
@@ -92,7 +92,7 @@ function Cache([string]$MODULE) {
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the connector level cache generation process for the current workspace module."
         $Attachments += $CurrentLogPath
-        $Subject = "An error has occurred in [$scriptname] on __URL__"
+        $Subject = "$logdate An error has occurred in [$scriptname] on __URL__"
         [string]$Body = @"
 An error has occured in the connector level cache generation process for the $MODULE module in the $WORKSPACE workspace.
 Attached is the log file detailing the error observed.
@@ -121,7 +121,7 @@ function Load([string]$MODULE) {
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the connector level dataset loading process for the current workspace module."
         $Attachments += $CurrentLogPath
-        $Subject = "An error has occurred in [$scriptname] on __URL__"
+        $Subject = "$logdate An error has occurred in [$scriptname] on __URL__"
         [string]$Body = @"
 An error has occured in the connector level dataset loading process for the $MODULE module in the $WORKSPACE workspace.
 Attached is the log file detailing the error observed.
@@ -149,7 +149,7 @@ function Deploy([string]$MODULE) {
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the application level cache generation for the current module in the environment."
         $Attachments += $CurrentLogPath
-        $Subject = "An error has occurred in [$scriptname] on __URL__"
+        $Subject = "$logdate An error has occurred in [$scriptname] on __URL__"
         [string]$Body = @"
 An error has occured in the application level cache generation process for the $MODULE module in the $ENVIRONMENT environment.
 Attached is the log file detailing the error observed.
