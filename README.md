@@ -58,21 +58,20 @@ usage: template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_ty
 ```
 - **-h**
   - Default help function, returns the expected format to invoke the script, returns the following 
-    ````
+    ```
     template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p]
     [-i <inputfile>] defines the name of the input configuration JSON file.  If omitted, config.json will be used.
     [-o <outputfile>] defines the name of the output file.  If omitted, output.bat.txt or output.ps1.txt will be used. If no file extension is included in <outfile>, .bat.txt or .ps1.txt will be appended, depending on <template_type>.
     [-t <template_type>] options are either '-t B' for the Batch Template or '-t P' for the Powershell Template.  If omitted, Batch mode will be used.
     [-p] parallel option is only available for Batch mode, if selected along with Powershell, will be ignored.    
-    ````
-
-- **-i [--ifile] <inputfile>** 
+    ```
+- **-i [--ifile] <_inputfile_>** 
   - By default, the expected `inputfile` is the provided **config.json**, which contains all of the necessary fields to properly generate the batch script.
   - _E.G._ `-i config.json` or `--ifile config.json`
-- **-o [--ofile] <outputfile>**
+- **-o [--ofile] <_outputfile_>**
   - For the value provided for `outputfile`, it is suggested a file extension be provided.  If no file extension is provided, `.bat.txt` or `.ps1.txt` will be appended, depending on `template_type`.  You can output to any file extension, recommended extensions are __*.txt__, __*.bat__, or __*.ps1__.
   - _E.G._ `-o data_refresh_script.bat` or `--ofile data_refresh_script.ps1`
-- **-t [--type] <template_type>**
+- **-t [--type] <_template_type_>**
   - The value provided for `template_type` can be either `B` for Batch or `P` for Powershell.  This command line flag determines which template is used to generate your script file.
   - _E.G._ `-t B` or `--type P`
 - **-p [--parallel]**
