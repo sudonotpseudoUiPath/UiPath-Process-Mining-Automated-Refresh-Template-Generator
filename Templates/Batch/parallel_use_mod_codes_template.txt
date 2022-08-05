@@ -2,6 +2,7 @@ REM Line Of Business: __LOB__
 REM Data Classification: __DATA_CLASSIFICATION__
 REM Requested Process Mining URL: __URL__
 REM Schedule: __SCHEDULE__
+REM Version: __VERSION__
 
 IF "%~1"=="SUBROUTINE" (GOTO :SUB) ELSE (GOTO :MAIN)
 

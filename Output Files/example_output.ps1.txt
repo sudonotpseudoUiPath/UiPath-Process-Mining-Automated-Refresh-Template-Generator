@@ -2,6 +2,7 @@
 #Data Classification: Data Classification Type
 #Requested Process Mining URL: https://www.processminingservername.com
 #Schedule: 12am EST nightly
+#Version: v1.4.1
 
 #Define Globals
 $LOGIN_ID="MyUserID"

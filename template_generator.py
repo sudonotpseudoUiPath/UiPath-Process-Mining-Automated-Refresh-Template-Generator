@@ -3,11 +3,12 @@
 import sys
 import getopt
 import json
+from datetime import date
 
 def hex_encode(input_string):
     return ''.join([(hex(ord(x)).replace('0x', '%%%%').upper() if not(x.isalnum()) else x) for x in input_string])
 
-def generate_template(input_file_name, output_file_name, is_parallel, template_type):
+def generate_template(input_file_name, output_file_name, is_parallel, template_type, version):
     #Check for template type
     default_file_extension = ".bat.txt"
     match template_type:
@@ -27,6 +28,8 @@ def generate_template(input_file_name, output_file_name, is_parallel, template_t
         output_file_name = f"output{default_file_extension}"
     elif not("." in output_file_name):
         output_file_name += default_file_extension
+    if version == '':
+        version = date.today().strftime("%Y.%m.%d")
 
     config = open(input_file_name)
     data = json.load(config)
@@ -42,6 +45,7 @@ def generate_template(input_file_name, output_file_name, is_parallel, template_t
         file_text = file_text.replace("__DATA_CLASSIFICATION__", data["DATA_CLASSIFICATION"])
         file_text = file_text.replace("__URL__", data["URL"])
         file_text = file_text.replace("__SCHEDULE__", data["SCHEDULE"])
+        file_text = file_text.replace("__VERSION__", version)
 
         if(template_type=="Batch"):
             file_text = file_text.replace("__MODULE_NAME__", ",".join(data["MODULE_NAME"]))
@@ -60,19 +64,20 @@ def generate_template(input_file_name, output_file_name, is_parallel, template_t
     print(output_file_name + " has been successfully generated.")
 
 def main(argv):
-    inputfile, outputfile, parallel, template_type = '','', False, 'B'
+    inputfile, outputfile, parallel, template_type, version = '','', False, 'B', ''
     try:
-        opts, args = getopt.getopt(argv,"hi:o:t:p",["ifile=","ofile=", "type="])
+        opts, args = getopt.getopt(argv,"hi:o:t:p:v:",["ifile=","ofile=", "parallel", "type=", "version="])
     except getopt.GetoptError:
         print("Invalid or unrecognized parameters detected.  Please use -h for help.")
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p]')
+            print('template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p] [-v <version>]')
             print("[-i <inputfile>] defines the name of the input configuration JSON file.  If omitted, config.json will be used.")
             print("[-o <outputfile>] defines the name of the output file.  If omitted, output.bat.txt or output.ps1.txt will be used. If no file extension is included in <outfile>, .bat.txt or .ps1.txt will be appended, depending on <template_type>.")
             print("[-t <template_type>] options are either '-t B' for the Batch Template or '-t P' for the Powershell Template.  If omitted, Batch mode will be used.")
             print("[-p] parallel option is only available for Batch mode, if selected along with Powershell, will be ignored.")
+            print("[-v <version>] defines version number of the script.  If omitted, version number will be set to YYYY.MM.DD")
             sys.exit()
         elif opt in ("-i", "--ifile"):
             inputfile = arg
@@ -82,8 +87,10 @@ def main(argv):
             parallel = True
         elif opt in ("-t", "--type"):
             template_type = arg
+        elif opt in ("-v", "--version"):
+            version = arg
 
-    generate_template(inputfile, outputfile, parallel, template_type)
+    generate_template(inputfile, outputfile, parallel, template_type, version)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

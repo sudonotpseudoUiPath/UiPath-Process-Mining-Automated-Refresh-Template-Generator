@@ -10,6 +10,9 @@ A script designed to aid in the automated refresh file generation process for us
 ## Dependencies
 - Python 3.10+
 ## Changelog
+- **08/05/22** - v1.4.1
+  - Added optional command line flag `-v [--version] <version>` to allow for easy version tracking.
+  - Updated all templates to account for new `version` value.
 - **07/21/22** - v1.4.0
   - `config.csv` and `smtp_settings.json` have been merged into a single `config.json` file to condense all fields into a single location.
     - `stmp_server` renamed to `SMTP_SERVER`.
@@ -54,16 +57,17 @@ A script designed to aid in the automated refresh file generation process for us
 ## Usage/Examples
 
 ```
-usage: template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p]
+usage: template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p] [-v <version>]
 ```
 - **-h**
   - Default help function, returns the expected format to invoke the script, returns the following 
     ```
-    template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p]
+    template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p] [-v <version>]
     [-i <inputfile>] defines the name of the input configuration JSON file.  If omitted, config.json will be used.
     [-o <outputfile>] defines the name of the output file.  If omitted, output.bat.txt or output.ps1.txt will be used. If no file extension is included in <outfile>, .bat.txt or .ps1.txt will be appended, depending on <template_type>.
     [-t <template_type>] options are either '-t B' for the Batch Template or '-t P' for the Powershell Template.  If omitted, Batch mode will be used.
-    [-p] parallel option is only available for Batch mode, if selected along with Powershell, will be ignored.    
+    [-p] parallel option is only available for Batch mode, if selected along with Powershell, will be ignored.
+    [-v <version>] defines version number of the script.  If omitted, version number will be set to YYYY.MM.DD    
     ```
 - **-i [--ifile] <_inputfile_>** 
   - By default, the expected `inputfile` is the provided **config.json**, which contains all of the necessary fields to properly generate the batch script.
@@ -76,8 +80,10 @@ usage: template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_ty
   - _E.G._ `-t B` or `--type P`
 - **-p [--parallel]**
   - A flag to select the parallel data loading template for multi module applicaitons.  Has no effect on single module loading.  Can only be used alongside the Batch template type.  If used with the Powershell template type, will be ignored.
+- **-v [--version] <_version_>**
+  - The value provided for `version` will set the generated script's version number.  If no `version` is provided, it will default to the current date in `YYYY.MM.DD` format.
 
-```python3 template_generator.py -i config.json -o data_refresh_script.bat -t B -p```
+```python3 template_generator.py -i config.json -o data_refresh_script.bat -t B -p -v example_V1```
 ## FAQ
 
 #### I have run the script, where is my output file?

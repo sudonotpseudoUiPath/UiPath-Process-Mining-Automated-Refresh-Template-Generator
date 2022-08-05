@@ -2,6 +2,7 @@
 #Data Classification: __DATA_CLASSIFICATION__
 #Requested Process Mining URL: __URL__
 #Schedule: __SCHEDULE__
+#Version: __VERSION__
 
 #Define Globals
 $LOGIN_ID="__LOGIN_ID_PLACEHOLDER__"
