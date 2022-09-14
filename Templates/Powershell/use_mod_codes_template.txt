@@ -106,6 +106,22 @@ This is an automated message sent out by the nightly refresh script set up on __
 "@
         Send-Mail $Subject $Body $Attachments
     }
+    elseif($($CurrentProcess.ExitCode) -eq 99){
+        $STATUSMESSAGE = " A warning has occurred in the connector level cache generation process for the current workspace module."
+        $Attachments += $CurrentLogPath
+        $Subject = "$logdate A warning has occurred in [$scriptname] on __URL__"
+        [string]$Body = @"
+A warning has occured in the connector level cache generation process for the $MODULE module in the $WORKSPACE workspace.
+Attached is the log file detailing the warning observed.
+
+Signed,
+Your automated nightly refresh.
+
+This is an automated message sent out by the nightly refresh script set up on __URL__, please do not respond to this email.
+[Script Name: $scriptname]
+"@
+        Send-Mail $Subject $Body $Attachments
+    }
     Log "Connector Level Cache Generation for module: $MODULE in: $WORKSPACE completed.  Exiting with Status Code $($CurrentProcess.ExitCode).$STATUSMESSAGE This can be found in the log for PID $($CurrentProcess.Id). ($CurrentLogPath)"
     return $($CurrentProcess.ExitCode)
 }
@@ -183,7 +199,7 @@ function Main {
     foreach($module in $MODULES){
         $STATUS = Cache $module
 
-        if($STATUS -eq 0){Load $module}
+        if(($STATUS -eq 0) -or ($STATUS -eq 99)) {Load $module}
         Deploy $module
     }
     Log "Batch Execution Completed"

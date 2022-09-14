@@ -10,6 +10,8 @@ A script designed to aid in the automated refresh file generation process for us
 ## Dependencies
 - Python 3.10+
 ## Changelog
+- **09/14/22** - v1.4.2
+  - Updated powershell templates to account for an edge case from non-breaking warnings occurring in the Connector Level Cache generation subprocess.
 - **08/05/22** - v1.4.1
   - Added optional command line flag `-v [--version] <version>` to allow for easy version tracking.
   - Updated all templates to account for new `version` value.
