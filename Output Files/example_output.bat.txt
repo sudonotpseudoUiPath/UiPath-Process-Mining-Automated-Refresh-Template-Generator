@@ -2,7 +2,7 @@ REM Line Of Business: LOB Name
 REM Data Classification: Data Classification Type
 REM Requested Process Mining URL: https://www.processminingservername.com
 REM Schedule: 12am EST nightly
-REM Version: v1.4.1
+REM Version: v1.4.3
 
 SET LOGIN_ID=MyUserID
 SET WORKSPACE_NAME=MyWorkspaceName

@@ -10,6 +10,8 @@ A script designed to aid in the automated refresh file generation process for us
 ## Dependencies
 - Python 3.10+
 ## Changelog
+- **11/11/22** - v1.4.3
+  - Added `Completion-Email` function to Powershell template to allow for an email notification to be sent out on script completion.  All associate log files for the run will be attached to this email for quick debugging and analysis purposes.
 - **09/14/22** - v1.4.2
   - Updated powershell templates to account for an edge case from non-breaking warnings occurring in the Connector Level Cache generation subprocess.
 - **08/05/22** - v1.4.1

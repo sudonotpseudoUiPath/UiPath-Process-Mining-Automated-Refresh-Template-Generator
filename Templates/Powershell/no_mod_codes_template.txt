@@ -16,6 +16,7 @@ $EMAILS = "__EMAILS__"
 $EMAILS_CC = "__EMAILS_CC__"
 $EMAILS_BCC = "__EMAILS_BCC__"
 $STATUS=0
+[array]$ALL_LOGS = @()
 
 #Set Global Value for date used for logging purposes
 $logdate = Get-Date -Format "yyyy-MM-dd"
@@ -69,7 +70,22 @@ Your automated nightly refresh.
 This is an automated message sent out by the nightly refresh script set up on __URL__, please do not respond to this email.
 [Script Name: $scriptname]
 "@
-        Send-Mail $Subject $Body
+    Send-Mail $Subject $Body
+}
+
+function Completion-Email(){
+    $Subject = "$logdate [$scriptname] has completed on __URL__"
+    [string]$Body = @"
+The refresh script execution on __URL__ has completed.
+
+Signed,
+Your automated nightly refresh.
+
+This is an automated message sent out by the nightly refresh script set up on __URL__, please do not respond to this email.
+[Script Name: $scriptname]
+"@
+    $ALL_LOGS += "$MAINDIR\logs\$logdate\auto_log_${scriptname}_$logdate.txt"
+    Send-Mail $Subject $Body $Attachments
 }
 
 function Log([string]$message){
@@ -90,6 +106,7 @@ function Cache([string]$MODULE) {
     $STATUSMESSAGE = ""
     $CurrentLogPath = GetLogPath $($CurrentProcess.Id) $timestamp
     [array]$Attachments = @()
+    $ALL_LOGS += $CurrentLogPath
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the connector level cache generation process for the current workspace module."
         $Attachments += $CurrentLogPath
@@ -135,6 +152,7 @@ function Load([string]$MODULE) {
     $STATUSMESSAGE = ""
     $CurrentLogPath = GetLogPath $($CurrentProcess.Id) $timestamp
     [array]$Attachments = @()
+    $ALL_LOGS += $CurrentLogPath
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the connector level dataset loading process for the current workspace module."
         $Attachments += $CurrentLogPath
@@ -163,6 +181,7 @@ function Deploy([string]$MODULE) {
     $STATUSMESSAGE = ""
     $CurrentLogPath = GetLogPath $($CurrentProcess.Id) $timestamp
     [array]$Attachments = @()
+    $ALL_LOGS += $CurrentLogPath
     if(($($CurrentProcess.ExitCode) -eq 1) -or (($($CurrentProcess.ExitCode) -eq 2))){
         $STATUSMESSAGE = " An error has occurred in the application level cache generation for the current module in the environment."
         $Attachments += $CurrentLogPath
@@ -203,6 +222,7 @@ function Main {
         Deploy $module
     }
     Log "Batch Execution Completed"
+    Completion-Email
 }
 
 Main
