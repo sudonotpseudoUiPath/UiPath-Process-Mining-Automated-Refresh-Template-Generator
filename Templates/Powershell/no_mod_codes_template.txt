@@ -60,7 +60,7 @@ function Send-Mail( $Subject, $Body, $Attachments ) {
 }
 
 function Startup-Email(){
-    $Subject = "$logdate [$scriptname] has beguin on __URL__"
+    $Subject = "$logdate [$scriptname] has begun on __URL__"
     [string]$Body = @"
 The refresh script execution on __URL__ has begun.
 
