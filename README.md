@@ -10,6 +10,9 @@ A script designed to aid in the automated refresh file generation process for us
 ## Dependencies
 - Python 3.10+
 ## Changelog
+- **03/07/23** - v1.4.4
+  - Added optional command line flag `-u` to allow for forcing of `use_mod_codes` for single module scripts.
+  - Added version number to top of `template_generator.py` file for quick reference.
 - **11/11/22** - v1.4.3
   - Added `Completion-Email` function to Powershell template to allow for an email notification to be sent out on script completion.  All associate log files for the run will be attached to this email for quick debugging and analysis purposes.
 - **09/14/22** - v1.4.2
@@ -61,7 +64,7 @@ A script designed to aid in the automated refresh file generation process for us
 ## Usage/Examples
 
 ```
-usage: template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p] [-v <version>]
+usage: template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p] [-v <version>] [-u]
 ```
 - **-h**
   - Default help function, returns the expected format to invoke the script, returns the following 
@@ -71,7 +74,9 @@ usage: template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_ty
     [-o <outputfile>] defines the name of the output file.  If omitted, output.bat.txt or output.ps1.txt will be used. If no file extension is included in <outfile>, .bat.txt or .ps1.txt will be appended, depending on <template_type>.
     [-t <template_type>] options are either '-t B' for the Batch Template or '-t P' for the Powershell Template.  If omitted, Batch mode will be used.
     [-p] parallel option is only available for Batch mode, if selected along with Powershell, will be ignored.
-    [-v <version>] defines version number of the script.  If omitted, version number will be set to YYYY.MM.DD    
+    [-v <version>] defines version number of the script.  If omitted, version number will be set to YYYY.MM.DD
+    [-u] forces the script to genrate with the use_mod_codes flag instead of no_mod_codes, allowing for single module application refreshing.  If omitted, single module scripts will generate with no_mod_codes.
+
     ```
 - **-i [--ifile] <_inputfile_>** 
   - By default, the expected `inputfile` is the provided **config.json**, which contains all of the necessary fields to properly generate the batch script.
@@ -86,8 +91,11 @@ usage: template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_ty
   - A flag to select the parallel data loading template for multi module applicaitons.  Has no effect on single module loading.  Can only be used alongside the Batch template type.  If used with the Powershell template type, will be ignored.
 - **-v [--version] <_version_>**
   - The value provided for `version` will set the generated script's version number.  If no `version` is provided, it will default to the current date in `YYYY.MM.DD` format.
+  - _E.G._ `-v '1.2.345'` or `--version '1.2.345'`
+- **-u [--use_mod_coeds]**
+  - A flag to select the force the script to be generated with the `use_mod_codes_template` in lieu of the `no_mod_codes_template`.  If omitted, single module scripts will be generated using the `no_mod_codes_template` file.
 
-```python3 template_generator.py -i config.json -o data_refresh_script.bat -t B -p -v example_V1```
+```python3 template_generator.py -i config.json -o data_refresh_script.bat -t B -p -v example_V1 -u```
 ## FAQ
 
 #### I have run the script, where is my output file?
@@ -101,6 +109,8 @@ If you do not provide a value for the `-o <outputfile>` command line argument, t
 #### I need to change my script from Single Module to Sharded Multi Module, what do I do?
 
 The script checks the number of provided module names in the `config.json` template file, and automatically selects the correct template and formatting to achieve either Single or Multi Module implementations.  No need to worry about anything too complex!
+
+**NOTE:** Sometimes a user may desire to have their script get generated using module codes even though there is only a single module listed.  In that case, please use the `-u || --use_mod_codes` flag.
 
 #### What is the difference between Parallel and Sequential Multi Module loading?
 

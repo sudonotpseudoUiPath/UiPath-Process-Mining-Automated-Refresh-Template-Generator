@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 #Written by Ben Weinfeld
+#Version 1.4.4
 import sys
 import getopt
 import json
@@ -8,7 +9,7 @@ from datetime import date
 def hex_encode(input_string):
     return ''.join([(hex(ord(x)).replace('0x', '%%%%').upper() if not(x.isalnum()) else x) for x in input_string])
 
-def generate_template(input_file_name, output_file_name, is_parallel, template_type, version):
+def generate_template(input_file_name, output_file_name, is_parallel, template_type, version, use_mod_codes):
     #Check for template type
     default_file_extension = ".bat.txt"
     match template_type:
@@ -33,7 +34,7 @@ def generate_template(input_file_name, output_file_name, is_parallel, template_t
 
     config = open(input_file_name)
     data = json.load(config)
-    template = f"Templates/{template_type}/parallel_use_mod_codes_template.txt" if (is_parallel and len(data["MODULE_NAME"])>1) else f"Templates/{template_type}/use_mod_codes_template.txt" if len(data["MODULE_NAME"])>1 else f"Templates/{template_type}/no_mod_codes_template.txt"
+    template = f"Templates/{template_type}/parallel_use_mod_codes_template.txt" if (is_parallel and len(data["MODULE_NAME"])>1) else f"Templates/{template_type}/use_mod_codes_template.txt" if (len(data["MODULE_NAME"])>1 or use_mod_codes==True) else f"Templates/{template_type}/no_mod_codes_template.txt"
     
     with open(template, "r") as file:
         file_text = file.read()
@@ -64,20 +65,21 @@ def generate_template(input_file_name, output_file_name, is_parallel, template_t
     print(output_file_name + " has been successfully generated.")
 
 def main(argv):
-    inputfile, outputfile, parallel, template_type, version = '','', False, 'B', ''
+    inputfile, outputfile, parallel, template_type, version, use_mod_codes = '','', False, 'B', '', False
     try:
-        opts, args = getopt.getopt(argv,"hi:o:t:p:v:",["ifile=","ofile=", "parallel", "type=", "version="])
+        opts, args = getopt.getopt(argv,"hi:o:t:p:v:u",["ifile=","ofile=", "parallel", "type=", "version=", "use_mod_codes"])
     except getopt.GetoptError:
         print("Invalid or unrecognized parameters detected.  Please use -h for help.")
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p] [-v <version>]')
+            print('template_generator.py [-i <inputfile>] [-o <outputfile>] [-t <template_type>] [-p] [-v <version>] [-u]')
             print("[-i <inputfile>] defines the name of the input configuration JSON file.  If omitted, config.json will be used.")
             print("[-o <outputfile>] defines the name of the output file.  If omitted, output.bat.txt or output.ps1.txt will be used. If no file extension is included in <outfile>, .bat.txt or .ps1.txt will be appended, depending on <template_type>.")
             print("[-t <template_type>] options are either '-t B' for the Batch Template or '-t P' for the Powershell Template.  If omitted, Batch mode will be used.")
             print("[-p] parallel option is only available for Batch mode, if selected along with Powershell, will be ignored.")
             print("[-v <version>] defines version number of the script.  If omitted, version number will be set to YYYY.MM.DD")
+            print("[-u] forces the script to genrate with the use_mod_codes flag instead of no_mod_codes, allowing for single module application refreshing.  If omitted, single module scripts will generate with no_mod_codes.")
             sys.exit()
         elif opt in ("-i", "--ifile"):
             inputfile = arg
@@ -89,8 +91,10 @@ def main(argv):
             template_type = arg
         elif opt in ("-v", "--version"):
             version = arg
+        elif opt in ("-u", "--use_mod_codes"):
+            use_mod_codes = True
 
-    generate_template(inputfile, outputfile, parallel, template_type, version)
+    generate_template(inputfile, outputfile, parallel, template_type, version, use_mod_codes)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

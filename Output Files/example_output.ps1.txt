@@ -2,7 +2,7 @@
 #Data Classification: Data Classification Type
 #Requested Process Mining URL: https://www.processminingservername.com
 #Schedule: 12am EST nightly
-#Version: v1.4.3
+#Version: v1.4.4
 
 #Define Globals
 $LOGIN_ID="MyUserID"
@@ -60,7 +60,7 @@ function Send-Mail( $Subject, $Body, $Attachments ) {
 }
 
 function Startup-Email(){
-    $Subject = "$logdate [$scriptname] has beguin on https://www.processminingservername.com"
+    $Subject = "$logdate [$scriptname] has begun on https://www.processminingservername.com"
     [string]$Body = @"
 The refresh script execution on https://www.processminingservername.com has begun.
 
